@@ -1,12 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './newPrompt.css'
 import Upload from '../upload/Upload';
-import { useState } from 'react';
 import { IKImage } from 'imagekitio-react';
 import model from '../../lib/gemini';
 import Markdown from 'react-markdown';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 
 const NewPrompt = ({ data }) => {
   const [question, setQuestion] = useState("");
@@ -20,16 +18,14 @@ const NewPrompt = ({ data }) => {
   });
 
   const chat = model.startChat({
-    history: [
-      {
-        role: "user",
-        parts: [{ text: "Hello I have 2 dogs in my house."}],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Great to meet you. What would you like to know?"}],
-      }
-    ],
+    history: data?.history
+      ? data.history
+          .filter(item => item.role && item.parts && item.parts[0] && item.parts[0].text) 
+          .map(({ role, parts }) => ({
+            role,
+            parts: [{ text: parts[0].text }],
+          }))
+      : [],
     generationConfig: {
       // maxOutputTokens: 100,
     },
@@ -43,7 +39,6 @@ const NewPrompt = ({ data }) => {
   }, [data, question, answer, img.dbData]);
 
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: () => {

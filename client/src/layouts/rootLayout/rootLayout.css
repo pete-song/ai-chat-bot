@@ -9,6 +9,11 @@
       align-items: center;
       justify-content: space-between;
   
+      span {
+        margin-left: 5px;
+        font-size: 30px; 
+      }
+
       .logo {
         display: flex;
         align-items: center;
